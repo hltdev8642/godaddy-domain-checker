@@ -4,6 +4,10 @@
 # desc: check if a domain is available on godaddy.com using godaddy API
 #
 
+# prevent ctrl+C / ctrl+D
+# trap '' 2
+
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[1;34m'
@@ -37,29 +41,44 @@ echo -e "${BLUE}-----------------------------------"
 echo -e "${BLUE}GODADDY DOMAIN AVAILABILITY CHECKER"
 echo -e "${BLUE}-----------------------------------\n"
 
-if [[ -z "$1" ]]; then
+# if [[ -z "$1" ]]; then
     # read -p "Enter a domain to check (ex:" QUERY
     echo -e "Enter a domain to check (ex: \`xyz.com\`)\n"
     read -p "-> " QUERY 
-else
-    QUERY="$1"
-fi
+    # read -p " -> https://" QUERY 
+# else
+    # QUERY=""$1"
+# fi
 
 
-result="$(curl -s -X GET -H "Authorization: sso-key ${API_KEY}:${API_SECRET}" "https://api.godaddy.com/v1/domains/available?domain=${QUERY}" | jq .available )"
+result=""$(curl -X "GET" "https://api.ote-godaddy.com/v1/domains/available?domain=$QUERY&checkType=FULL&forTransfer=false" -H "accept: application/json" -H "Authorization: sso-key $sso_key" | jq .available )""
+# printf "%s" $result
+# result=$(curl "https://api.godaddy.com/v1/domains/available?main=${QUERY}&key=${API_KEY}&secret=$API_SECRET" | jq .available )
+# result=$(echo \"$result\")
+# echo $result
+
+# if [[ $result = true ]]; then
+#   print_available "$QUERY"
+#   reboot
+# else
+#   print_unavailable "$QUERY"
+#   reboot
+# fi
 case $result in
     "true" )
+        # echo true
         print_available "$QUERY"
         reboot
         ;;
     "false" )
+        # echo false
         print_unavailable "$QUERY"
         reboot
         ;;
     *)
         print_error
-        reboot 
-        ;;
+        reboot
+      ;;
 esac
 
 }

@@ -1,2 +1,2 @@
 language = "bash"
-run = "bash godaddy-domain-checker.sh"
+run = "./godaddy-domain-checker.sh"
